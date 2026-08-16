@@ -1,1 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#07150f" />
+  <title>Poker Night Scoreboard</title>
+  <style>
+    :root {
+      --bg: #07150f;
+      --panel: rgba(16, 38, 28, 0.92);
+      --panel-2: rgba(22, 52, 38, 0.95);
+      --line: rgba(255,255,255,.1);
+      --text: #f7f3e8;
+      --muted: #b9c5bc;
+      --gold: #d9b867;
+      --gold-2: #f0d98f;
+      --red: #b93b46;
+      --green: #2f8c63;
+      --shadow: 0 18px 55px rgba(0,0,0,.35);
+    }
 
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 15%, rgba(217,184,103,.08), transparent 28%),
+        radial-gradient(circle at 85% 80%, rgba(185,59,70,.08), transparent 24%),
+        linear-gradient(145deg, #06110d 0%, #0a1d15 46%, #07150f 100%);
+      padding: max(24px, env(safe-area-inset-top)) 16px max(28px, env(safe-area-inset-bottom));
+    }
+
+    .wrap {
+      width: min(760px, 100%);
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin: 10px 0 22px;
+    }
+
+    .eyebrow {
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .22em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(32px, 7vw, 54px);
+      line-height: .98;
+      letter-spacing: -.04em;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    .leader-card {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(217,184,103,.35);
+      background: linear-gradient(145deg, rgba(50,70,45,.98), rgba(20,45,32,.98));
+      border-radius: 24px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+
+    .leader-card::after {
+      content: "♠";
+      position: absolute;
+      right: 18px;
+      top: -12px;
+      font-size: 110px;
+      color: rgba(255,255,255,.05);
+      transform: rotate(12deg);
+    }
+
+    .leader-label {
+      color: var(--gold-2);
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .leader-row {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 8px;
+    }
+
+    .leader-name {
+      font-size: clamp(28px, 7vw, 44px);
+      font-weight: 900;
+      letter-spacing: -.04em;
+    }
+
+    .leader-score {
+      font-size: clamp(38px, 10vw, 66px);
+      font-weight: 950;
+      color: var(--gold-2);
+      line-height: .9;
+      letter-spacing: -.05em;
+    }
+
+    .board {
+      display: grid;
+      gap: 12px;
+    }
+
+    .player {
+      display: grid;
+      grid-template-columns: 52px 1fr auto;
+      align-items: center;
+      gap: 14px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 14px;
+      box-shadow: 0 10px 28px rgba(0,0,0,.2);
+    }
+
+    .rank {
+      width: 46px;
+      height: 46px;
+      border-radius: 15px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,.06);
+      color: var(--gold-2);
+      font-weight: 900;
+      font-size: 18px;
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .name {
+      font-weight: 850;
+      font-size: 21px;
+      letter-spacing: -.02em;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .score {
+      min-width: 74px;
+      text-align: center;
+      font-size: 30px;
+      font-weight: 950;
+      letter-spacing: -.04em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    button {
+      appearance: none;
+      border: 0;
+      cursor: pointer;
+      font: inherit;
+      color: var(--text);
+    }
+
+    .score-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 13px;
+      background: var(--panel-2);
+      border: 1px solid var(--line);
+      font-size: 24px;
+      line-height: 1;
+      transition: transform .12s ease, background .12s ease;
+    }
+
+    .score-btn:active { transform: scale(.94); }
+    .plus { background: rgba(47,140,99,.25); }
+    .minus { background: rgba(185,59,70,.2); }
+
+    .footer-actions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    .action {
+      padding: 11px 16px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--line);
+      font-weight: 750;
+      font-size: 14px;
+    }
+
+    .action.primary {
+      color: #1f1805;
+      background: linear-gradient(180deg, var(--gold-2), var(--gold));
+      border-color: transparent;
+    }
+
+    .hint {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 14px;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 560px) {
+      .player {
+        grid-template-columns: 44px 1fr;
+        gap: 10px 12px;
+      }
+
+      .rank {
+        width: 42px;
+        height: 42px;
+      }
+
+      .controls {
+        grid-column: 1 / -1;
+        justify-content: flex-end;
+      }
+
+      .score {
+        min-width: 82px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header class="header">
+      <div class="eyebrow">♣ Poker Night ♦</div>
+      <h1>Scoreboard</h1>
+      <div class="subtitle">Tap + or − to update a score. Rankings update automatically.</div>
+    </header>
+
+    <section class="leader-card" aria-live="polite">
+      <div class="leader-label">Current Leader</div>
+      <div class="leader-row">
+        <div class="leader-name" id="leaderName">Justin</div>
+        <div class="leader-score" id="leaderScore">280</div>
+      </div>
+    </section>
+
+    <section class="board" id="board"></section>
+
+    <div class="footer-actions">
+      <button class="action primary" id="saveBtn">Save Scores</button>
+      <button class="action" id="resetBtn">Reset to Original</button>
+    </div>
+
+    <div class="hint">Scores are saved on this device automatically.</div>
+  </main>
+
+  <script>
+    const originalPlayers = [
+      { name: 'Justin', score: 280 },
+      { name: 'Jasmine', score: 208 },
+      { name: 'Dylan', score: 187 },
+      { name: 'James', score: 125 }
+    ];
+
+    const storageKey = 'pokerNightScores-v1';
+    let players = loadScores();
+
+    function loadScores() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(storageKey));
+        if (Array.isArray(saved) && saved.length === originalPlayers.length) return saved;
+      } catch (_) {}
+      return originalPlayers.map(player => ({ ...player }));
+    }
+
+    function saveScores() {
+      localStorage.setItem(storageKey, JSON.stringify(players));
+    }
+
+    function changeScore(name, amount) {
+      const player = players.find(p => p.name === name);
+      if (!player) return;
+      player.score += amount;
+      saveScores();
+      render();
+    }
+
+    function render() {
+      const sorted = [...players].sort((a, b) => b.score - a.score);
+      const board = document.getElementById('board');
+      board.innerHTML = '';
+
+      document.getElementById('leaderName').textContent = sorted[0].name;
+      document.getElementById('leaderScore').textContent = sorted[0].score;
+
+      sorted.forEach((player, index) => {
+        const row = document.createElement('article');
+        row.className = 'player';
+        row.innerHTML = `
+          <div class="rank">#${index + 1}</div>
+          <div class="name">${player.name}</div>
+          <div class="controls">
+            <button class="score-btn minus" aria-label="Subtract one point from ${player.name}">−</button>
+            <div class="score">${player.score}</div>
+            <button class="score-btn plus" aria-label="Add one point to ${player.name}">+</button>
+          </div>
+        `;
+
+        row.querySelector('.minus').addEventListener('click', () => changeScore(player.name, -1));
+        row.querySelector('.plus').addEventListener('click', () => changeScore(player.name, 1));
+        board.appendChild(row);
+      });
+    }
+
+    document.getElementById('saveBtn').addEventListener('click', () => {
+      saveScores();
+      const button = document.getElementById('saveBtn');
+      const oldText = button.textContent;
+      button.textContent = 'Saved ✓';
+      setTimeout(() => button.textContent = oldText, 900);
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      if (!confirm('Reset all scores back to Justin 280, Jasmine 208, Dylan 187, and James 125?')) return;
+      players = originalPlayers.map(player => ({ ...player }));
+      saveScores();
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
