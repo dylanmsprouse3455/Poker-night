@@ -3,347 +3,824 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#07150f" />
-  <title>Poker Night Scoreboard</title>
+  <meta name="theme-color" content="#120304" />
+  <title>Poker Night • Scoreboard</title>
   <style>
     :root {
-      --bg: #07150f;
-      --panel: rgba(16, 38, 28, 0.92);
-      --panel-2: rgba(22, 52, 38, 0.95);
-      --line: rgba(255,255,255,.1);
-      --text: #f7f3e8;
-      --muted: #b9c5bc;
-      --gold: #d9b867;
-      --gold-2: #f0d98f;
-      --red: #b93b46;
-      --green: #2f8c63;
-      --shadow: 0 18px 55px rgba(0,0,0,.35);
+      --bg: #070102;
+      --bg-2: #120304;
+      --panel: rgba(18, 4, 6, 0.92);
+      --panel-2: rgba(29, 6, 10, 0.96);
+      --red: #a20f20;
+      --red-2: #d91f3e;
+      --red-3: #ff5c7a;
+      --gold: #d7b06a;
+      --gold-2: #f4d79c;
+      --text: #f9edf0;
+      --muted: #c9aeb5;
+      --line: rgba(255,255,255,0.1);
+      --shadow: 0 28px 80px rgba(0,0,0,0.45);
+      --winner-shadow: 0 0 0 1px rgba(244,215,156,0.16), 0 0 45px rgba(215,176,106,0.18), 0 22px 55px rgba(0,0,0,0.45);
+      --radius-xl: 34px;
+      --radius-lg: 26px;
+      --radius-md: 18px;
     }
 
     * { box-sizing: border-box; }
 
-    body {
+    html, body {
       margin: 0;
-      min-height: 100vh;
+      min-height: 100%;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at 15% 15%, rgba(217,184,103,.08), transparent 28%),
-        radial-gradient(circle at 85% 80%, rgba(185,59,70,.08), transparent 24%),
-        linear-gradient(145deg, #06110d 0%, #0a1d15 46%, #07150f 100%);
-      padding: max(24px, env(safe-area-inset-top)) 16px max(28px, env(safe-area-inset-bottom));
+        radial-gradient(circle at 20% 20%, rgba(255, 90, 120, 0.08), transparent 18%),
+        radial-gradient(circle at 80% 10%, rgba(217,31,62,0.13), transparent 24%),
+        radial-gradient(circle at 50% 100%, rgba(70,0,10,0.55), transparent 42%),
+        linear-gradient(180deg, #090102 0%, #120304 50%, #060102 100%);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.016) 0 2px, transparent 2px 6px),
+        repeating-linear-gradient(0deg, rgba(255,255,255,0.01) 0 3px, transparent 3px 7px),
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,0.04), transparent 60%);
+      mix-blend-mode: soft-light;
+      opacity: 0.4;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 50% 42%, rgba(166,14,32,0.2), transparent 38%),
+        linear-gradient(90deg, rgba(0,0,0,0.5), transparent 16%, transparent 84%, rgba(0,0,0,0.5));
+      opacity: 0.7;
+    }
+
+    .velvet {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.28;
+      background:
+        repeating-linear-gradient(110deg, rgba(255,255,255,0.03) 0 10px, rgba(0,0,0,0) 10px 22px),
+        repeating-linear-gradient(-110deg, rgba(255,255,255,0.025) 0 8px, rgba(0,0,0,0) 8px 18px);
+      filter: blur(10px);
     }
 
     .wrap {
-      width: min(760px, 100%);
+      position: relative;
+      z-index: 1;
+      width: min(1150px, calc(100% - 28px));
       margin: 0 auto;
+      padding: max(26px, env(safe-area-inset-top)) 0 max(38px, env(safe-area-inset-bottom));
     }
 
-    .header {
-      text-align: center;
-      margin: 10px 0 22px;
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 28px;
+      border-radius: var(--radius-xl);
+      background:
+        linear-gradient(145deg, rgba(45, 7, 12, 0.95), rgba(15, 2, 4, 0.98)),
+        linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0));
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: var(--shadow);
     }
 
-    .eyebrow {
-      color: var(--gold);
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: .22em;
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at top right, rgba(244,215,156,0.13), transparent 24%),
+        radial-gradient(circle at bottom left, rgba(217,31,62,0.16), transparent 26%),
+        linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.08) 48%, transparent 54%);
+      transform: translateX(-110%);
+      animation: heroSheen 9s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes heroSheen {
+      0% { transform: translateX(-110%); }
+      100% { transform: translateX(110%); }
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.09);
+      color: var(--gold-2);
+      letter-spacing: 0.14em;
       text-transform: uppercase;
-      margin-bottom: 8px;
+      font-weight: 800;
+      font-size: 0.78rem;
     }
 
     h1 {
-      margin: 0;
-      font-size: clamp(32px, 7vw, 54px);
-      line-height: .98;
-      letter-spacing: -.04em;
-    }
-
-    .subtitle {
-      color: var(--muted);
-      margin-top: 10px;
-      font-size: 14px;
-    }
-
-    .leader-card {
-      position: relative;
-      overflow: hidden;
-      border: 1px solid rgba(217,184,103,.35);
-      background: linear-gradient(145deg, rgba(50,70,45,.98), rgba(20,45,32,.98));
-      border-radius: 24px;
-      padding: 22px;
-      box-shadow: var(--shadow);
-      margin-bottom: 16px;
-    }
-
-    .leader-card::after {
-      content: "♠";
-      position: absolute;
-      right: 18px;
-      top: -12px;
-      font-size: 110px;
-      color: rgba(255,255,255,.05);
-      transform: rotate(12deg);
-    }
-
-    .leader-label {
-      color: var(--gold-2);
-      font-weight: 800;
-      font-size: 12px;
-      letter-spacing: .16em;
+      margin: 16px 0 10px;
+      font-size: clamp(2.6rem, 7vw, 5.8rem);
+      line-height: 0.9;
+      letter-spacing: -0.06em;
       text-transform: uppercase;
     }
 
-    .leader-row {
-      display: flex;
-      align-items: end;
-      justify-content: space-between;
-      gap: 16px;
-      margin-top: 8px;
+    .subcopy {
+      max-width: 62ch;
+      margin: 0;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.55;
     }
 
-    .leader-name {
-      font-size: clamp(28px, 7vw, 44px);
-      font-weight: 900;
-      letter-spacing: -.04em;
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+      gap: 18px;
+      margin-top: 24px;
     }
 
-    .leader-score {
-      font-size: clamp(38px, 10vw, 66px);
-      font-weight: 950;
+    .winner-card,
+    .session-card {
+      position: relative;
+      border-radius: 28px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.09);
+      padding: 20px;
+      min-height: 100%;
+    }
+
+    .winner-card {
+      background:
+        radial-gradient(circle at top right, rgba(244,215,156,0.16), transparent 35%),
+        linear-gradient(160deg, rgba(28,6,10,0.96), rgba(16,3,5,0.98));
+      box-shadow: var(--winner-shadow);
+    }
+
+    .session-card {
+      background:
+        radial-gradient(circle at top right, rgba(255,92,122,0.16), transparent 30%),
+        linear-gradient(160deg, rgba(35,7,12,0.96), rgba(16,3,5,0.98));
+    }
+
+    .label {
+      font-size: 0.76rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-weight: 800;
       color: var(--gold-2);
-      line-height: .9;
-      letter-spacing: -.05em;
+      margin-bottom: 8px;
     }
 
-    .board {
-      display: grid;
-      gap: 12px;
-    }
-
-    .player {
-      display: grid;
-      grid-template-columns: 52px 1fr auto;
+    .winner-main {
+      display: flex;
+      gap: 16px;
       align-items: center;
-      gap: 14px;
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      padding: 14px;
-      box-shadow: 0 10px 28px rgba(0,0,0,.2);
     }
 
-    .rank {
-      width: 46px;
-      height: 46px;
-      border-radius: 15px;
+    .winner-medal {
+      width: 86px;
+      height: 86px;
+      flex: 0 0 auto;
       display: grid;
       place-items: center;
-      background: rgba(255,255,255,.06);
-      color: var(--gold-2);
+      border-radius: 50%;
+      color: #230f03;
+      font-size: 2rem;
       font-weight: 900;
-      font-size: 18px;
-      border: 1px solid rgba(255,255,255,.08);
+      background: radial-gradient(circle at 30% 30%, #ffeab7, #d7b06a 68%, #9a6d2b 100%);
+      box-shadow: 0 0 34px rgba(215,176,106,0.35), inset 0 2px 6px rgba(255,255,255,0.25);
+      animation: pulseWinner 2.8s ease-in-out infinite;
     }
 
-    .name {
-      font-weight: 850;
-      font-size: 21px;
-      letter-spacing: -.02em;
+    @keyframes pulseWinner {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 28px rgba(215,176,106,0.32), inset 0 2px 6px rgba(255,255,255,0.25); }
+      50% { transform: scale(1.05); box-shadow: 0 0 42px rgba(215,176,106,0.42), inset 0 2px 6px rgba(255,255,255,0.25); }
     }
 
-    .controls {
+    .winner-name {
+      margin: 0;
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+    }
+
+    .winner-score {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 1.05rem;
+    }
+
+    .winner-flair {
       display: flex;
-      align-items: center;
-      gap: 8px;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
     }
 
-    .score {
-      min-width: 74px;
-      text-align: center;
-      font-size: 30px;
-      font-weight: 950;
-      letter-spacing: -.04em;
-      font-variant-numeric: tabular-nums;
-    }
-
-    button {
-      appearance: none;
-      border: 0;
-      cursor: pointer;
-      font: inherit;
+    .pill {
+      padding: 10px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      font-size: 0.88rem;
       color: var(--text);
     }
 
-    .score-btn {
-      width: 42px;
-      height: 42px;
-      border-radius: 13px;
-      background: var(--panel-2);
-      border: 1px solid var(--line);
-      font-size: 24px;
+    .session-value {
+      margin: 0;
+      font-size: clamp(1.7rem, 5vw, 3.2rem);
+      font-weight: 900;
       line-height: 1;
-      transition: transform .12s ease, background .12s ease;
     }
 
-    .score-btn:active { transform: scale(.94); }
-    .plus { background: rgba(47,140,99,.25); }
-    .minus { background: rgba(185,59,70,.2); }
+    .session-note {
+      margin: 12px 0 0;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 0.95rem;
+    }
 
-    .footer-actions {
-      display: flex;
+    .winner-toggle {
+      margin-top: 20px;
+      display: inline-flex;
+      align-items: center;
       justify-content: center;
       gap: 10px;
-      margin-top: 18px;
+      border: 0;
+      cursor: pointer;
+      font: inherit;
+      color: #20080c;
+      font-weight: 800;
+      padding: 14px 18px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-2));
+      box-shadow: 0 16px 30px rgba(215,176,106,0.22);
+      transition: transform 0.16s ease, filter 0.16s ease;
+    }
+
+    .winner-toggle:hover { transform: translateY(-1px); filter: brightness(1.05); }
+    .winner-toggle:active { transform: translateY(0); }
+
+    .section {
+      margin-top: 22px;
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: linear-gradient(180deg, rgba(18,4,6,0.95), rgba(12,2,4,0.98));
+      box-shadow: var(--shadow);
+    }
+
+    .section-head {
+      padding: 22px 24px 10px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
       flex-wrap: wrap;
     }
 
-    .action {
-      padding: 11px 16px;
-      border-radius: 14px;
-      background: rgba(255,255,255,.06);
-      border: 1px solid var(--line);
-      font-weight: 750;
-      font-size: 14px;
+    .section-title {
+      margin: 0;
+      font-size: clamp(1.35rem, 3vw, 1.9rem);
+      font-weight: 900;
+      letter-spacing: -0.03em;
     }
 
-    .action.primary {
-      color: #1f1805;
-      background: linear-gradient(180deg, var(--gold-2), var(--gold));
-      border-color: transparent;
-    }
-
-    .hint {
-      text-align: center;
+    .section-copy {
+      margin: 8px 0 0;
       color: var(--muted);
-      font-size: 12px;
-      margin-top: 14px;
-      line-height: 1.45;
+      font-size: 0.96rem;
+      max-width: 55ch;
+      line-height: 1.55;
+    }
+
+    .mini-note {
+      padding: 11px 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--muted);
+      font-size: 0.88rem;
+      max-width: 250px;
+    }
+
+    .score-grid {
+      padding: 14px 16px 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .row {
+      position: relative;
+      display: grid;
+      grid-template-columns: 86px minmax(0, 1.2fr) minmax(140px, 0.7fr) minmax(140px, 0.85fr);
+      gap: 14px;
+      align-items: center;
+      padding: 16px;
+      border-radius: 24px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.012)),
+        linear-gradient(160deg, rgba(43,8,13,0.84), rgba(18,4,7,0.9));
+      border: 1px solid rgba(255,255,255,0.08);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+
+    .row:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 36px rgba(0,0,0,0.25);
+      border-color: rgba(255,255,255,0.12);
+    }
+
+    .row.winner {
+      background:
+        radial-gradient(circle at top right, rgba(244,215,156,0.15), transparent 28%),
+        linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.015)),
+        linear-gradient(160deg, rgba(53,11,16,0.92), rgba(22,4,7,0.95));
+      border-color: rgba(244,215,156,0.26);
+      box-shadow: var(--winner-shadow);
+      overflow: hidden;
+    }
+
+    .row.winner::before {
+      content: "";
+      position: absolute;
+      inset: -30% -20%;
+      background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.1) 48%, transparent 55%);
+      animation: cardShimmer 6s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes cardShimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .place {
+      width: 70px;
+      height: 70px;
+      display: grid;
+      place-items: center;
+      border-radius: 22px;
+      font-weight: 900;
+      font-size: 1.2rem;
+      background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--text);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+      margin-inline: auto;
+    }
+
+    .row.winner .place {
+      color: #210d03;
+      background: radial-gradient(circle at 30% 30%, #ffeab7, #d7b06a 72%, #9a6d2b 100%);
+      box-shadow: 0 0 26px rgba(215,176,106,0.28), inset 0 2px 5px rgba(255,255,255,0.2);
+    }
+
+    .player {
+      min-width: 0;
+    }
+
+    .name-line {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .avatar {
+      width: 58px;
+      height: 58px;
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      border-radius: 18px;
+      font-weight: 900;
+      background: linear-gradient(145deg, rgba(174,17,36,0.78), rgba(53,6,14,0.95));
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 14px 28px rgba(0,0,0,0.2);
+    }
+
+    .row.winner .avatar {
+      background: linear-gradient(145deg, rgba(215,176,106,0.9), rgba(126,79,19,0.94));
+      color: #271202;
+    }
+
+    .name {
+      margin: 0;
+      font-size: 1.18rem;
+      font-weight: 850;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .status {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .score-box,
+    .meta-box {
+      min-width: 0;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .score-number {
+      margin: 0;
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-weight: 900;
+      letter-spacing: -0.05em;
+    }
+
+    .score-label,
+    .meta-label {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .meta-main {
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
+    .footer {
+      padding: 0 24px 24px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+
+    .winner-mode {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      background: rgba(4, 0, 1, 0.72);
+      backdrop-filter: blur(12px);
+      z-index: 20;
+      padding: 18px;
+    }
+
+    .winner-mode.active {
+      display: grid;
+      animation: fadeIn 0.18s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .winner-overlay {
+      position: relative;
+      width: min(720px, 100%);
+      border-radius: 34px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at top center, rgba(244,215,156,0.18), transparent 30%),
+        radial-gradient(circle at bottom left, rgba(217,31,62,0.18), transparent 36%),
+        linear-gradient(160deg, rgba(29,6,10,0.98), rgba(8,1,2,0.99));
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 32px 90px rgba(0,0,0,0.55);
+      padding: 34px 26px 28px;
+      text-align: center;
+      isolation: isolate;
+    }
+
+    .winner-overlay::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.1) 48%, transparent 56%);
+      transform: translateX(-120%);
+      animation: overlaySheen 4s linear infinite;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    @keyframes overlaySheen {
+      0% { transform: translateX(-120%); }
+      100% { transform: translateX(120%); }
+    }
+
+    .overlay-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--gold-2);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+
+    .overlay-name {
+      margin: 18px 0 6px;
+      font-size: clamp(2.4rem, 9vw, 5.4rem);
+      line-height: 0.9;
+      letter-spacing: -0.06em;
+      text-transform: uppercase;
+    }
+
+    .overlay-score {
+      font-size: clamp(1.2rem, 4vw, 1.9rem);
+      color: var(--gold-2);
+      font-weight: 800;
+    }
+
+    .overlay-copy {
+      max-width: 42ch;
+      margin: 16px auto 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .chips {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 22px 0 0;
+    }
+
+    .chip {
+      width: 62px;
+      height: 62px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      box-shadow: 0 18px 34px rgba(0,0,0,0.25);
+      animation: floatChip 2.8s ease-in-out infinite;
+    }
+
+    .chip:nth-child(1) { background: radial-gradient(circle at 30% 30%, #ff7b92, #a20f20 72%); animation-delay: 0s; }
+    .chip:nth-child(2) { background: radial-gradient(circle at 30% 30%, #ffeab7, #d7b06a 72%); color: #2b1604; animation-delay: 0.25s; }
+    .chip:nth-child(3) { background: radial-gradient(circle at 30% 30%, #ff7b92, #a20f20 72%); animation-delay: 0.5s; }
+    .chip:nth-child(4) { background: radial-gradient(circle at 30% 30%, #ffeab7, #d7b06a 72%); color: #2b1604; animation-delay: 0.75s; }
+
+    @keyframes floatChip {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .close-btn {
+      margin-top: 24px;
+      border: 0;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 800;
+      color: var(--text);
+      padding: 13px 18px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    @media (max-width: 900px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .row {
+        grid-template-columns: 78px minmax(0, 1fr);
+      }
+
+      .score-box,
+      .meta-box {
+        grid-column: 2;
+      }
     }
 
     @media (max-width: 560px) {
-      .player {
-        grid-template-columns: 44px 1fr;
-        gap: 10px 12px;
-      }
-
-      .rank {
-        width: 42px;
-        height: 42px;
-      }
-
-      .controls {
-        grid-column: 1 / -1;
-        justify-content: flex-end;
-      }
-
-      .score {
-        min-width: 82px;
-      }
+      .wrap { width: min(100% - 18px, 1150px); }
+      .hero,
+      .section { border-radius: 26px; }
+      .hero { padding: 20px; }
+      .section-head,
+      .footer { padding-left: 18px; padding-right: 18px; }
+      .score-grid { padding: 12px; }
+      .winner-main { align-items: flex-start; }
+      .winner-medal { width: 74px; height: 74px; }
+      .row { padding: 14px; border-radius: 20px; }
+      .place { width: 62px; height: 62px; border-radius: 18px; }
+      .avatar { width: 52px; height: 52px; border-radius: 16px; }
+      .winner-overlay { border-radius: 28px; padding: 28px 18px 24px; }
     }
   </style>
 </head>
 <body>
-  <main class="wrap">
-    <header class="header">
-      <div class="eyebrow">♣ Poker Night ♦</div>
-      <h1>Scoreboard</h1>
-      <div class="subtitle">Tap + or − to update a score. Rankings update automatically.</div>
-    </header>
+  <div class="velvet"></div>
+  <div class="wrap">
+    <section class="hero">
+      <span class="tag">♦ Velvet Table Artifact • Poker Night</span>
+      <h1>Poker Night</h1>
+      <p class="subcopy">A black-and-red scoreboard artifact with a velvet feel, dramatic winner treatment, and zero on-page score editing. Update the player scores in the code before each game night, and the board handles the rest.</p>
 
-    <section class="leader-card" aria-live="polite">
-      <div class="leader-label">Current Leader</div>
-      <div class="leader-row">
-        <div class="leader-name" id="leaderName">Justin</div>
-        <div class="leader-score" id="leaderScore">280</div>
+      <div class="hero-grid">
+        <div class="winner-card">
+          <div class="label">Current Winner</div>
+          <div class="winner-main">
+            <div class="winner-medal">♛</div>
+            <div>
+              <h2 class="winner-name" id="heroWinnerName">Justin</h2>
+              <div class="winner-score" id="heroWinnerScore">280 chips • first place</div>
+            </div>
+          </div>
+          <div class="winner-flair">
+            <span class="pill" id="heroLeadText">Leading the table</span>
+            <span class="pill" id="heroGapText">Top stack right now</span>
+          </div>
+          <button class="winner-toggle" id="winnerToggle" type="button">Spotlight Winner</button>
+        </div>
+
+        <div class="session-card">
+          <div class="label">Session Details</div>
+          <p class="session-value" id="sessionDate">8/17/26</p>
+          <p class="session-note">
+            Original note kept: <strong>“July damn it”</strong>.<br />
+            Total chips in play: <strong id="totalChips">800</strong>.<br />
+            This board is display-only so nobody can mess with the numbers during game night.
+          </p>
+        </div>
       </div>
     </section>
 
-    <section class="board" id="board"></section>
+    <section class="section">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">Final Table</h2>
+          <p class="section-copy">Ranks update automatically from highest stack to lowest stack. To change scores for the next game night, edit the player values in the script section near the bottom of this file.</p>
+        </div>
+        <div class="mini-note">Display mode only • no on-screen editing • built to look polished on desktop and mobile</div>
+      </div>
 
-    <div class="footer-actions">
-      <button class="action primary" id="saveBtn">Save Scores</button>
-      <button class="action" id="resetBtn">Reset to Original</button>
+      <div class="score-grid" id="scoreGrid"></div>
+      <div class="footer">Tip: if you want a new game-night artifact, just update the date and player chip counts in the code. The winner panel, rankings, and spotlight effect will all update automatically.</div>
+    </section>
+  </div>
+
+  <div class="winner-mode" id="winnerMode" aria-hidden="true">
+    <div class="winner-overlay">
+      <div class="overlay-badge">♛ Winner Spotlight</div>
+      <h2 class="overlay-name" id="overlayWinnerName">Justin</h2>
+      <div class="overlay-score" id="overlayWinnerScore">280 chips</div>
+      <p class="overlay-copy" id="overlayWinnerCopy">Took the top seat, kept the biggest stack, and owned the night.</p>
+      <div class="chips">
+        <div class="chip">♦</div>
+        <div class="chip">♛</div>
+        <div class="chip">♠</div>
+        <div class="chip">♥</div>
+      </div>
+      <button class="close-btn" id="closeWinnerMode" type="button">Close Spotlight</button>
     </div>
-
-    <div class="hint">Scores are saved on this device automatically.</div>
-  </main>
+  </div>
 
   <script>
-    const originalPlayers = [
+    /*
+      Update this section before each game night.
+      Change the date and chip values here only.
+    */
+    const session = {
+      date: '8/17/26',
+      note: 'July damn it'
+    };
+
+    const players = [
       { name: 'Justin', score: 280 },
       { name: 'Jasmine', score: 208 },
       { name: 'Dylan', score: 187 },
       { name: 'James', score: 125 }
     ];
 
-    const storageKey = 'pokerNightScores-v1';
-    let players = loadScores();
+    const scoreGrid = document.getElementById('scoreGrid');
+    const totalChipsEl = document.getElementById('totalChips');
+    const sessionDateEl = document.getElementById('sessionDate');
+    const heroWinnerNameEl = document.getElementById('heroWinnerName');
+    const heroWinnerScoreEl = document.getElementById('heroWinnerScore');
+    const heroLeadTextEl = document.getElementById('heroLeadText');
+    const heroGapTextEl = document.getElementById('heroGapText');
+    const winnerToggle = document.getElementById('winnerToggle');
+    const winnerMode = document.getElementById('winnerMode');
+    const closeWinnerMode = document.getElementById('closeWinnerMode');
+    const overlayWinnerNameEl = document.getElementById('overlayWinnerName');
+    const overlayWinnerScoreEl = document.getElementById('overlayWinnerScore');
+    const overlayWinnerCopyEl = document.getElementById('overlayWinnerCopy');
 
-    function loadScores() {
-      try {
-        const saved = JSON.parse(localStorage.getItem(storageKey));
-        if (Array.isArray(saved) && saved.length === originalPlayers.length) return saved;
-      } catch (_) {}
-      return originalPlayers.map(player => ({ ...player }));
+    const sortedPlayers = [...players].sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));
+    const winner = sortedPlayers[0];
+    const totalChips = sortedPlayers.reduce((sum, player) => sum + player.score, 0);
+
+    sessionDateEl.textContent = session.date;
+    totalChipsEl.textContent = totalChips;
+
+    heroWinnerNameEl.textContent = winner.name;
+    heroWinnerScoreEl.textContent = `${winner.score} chips • first place`;
+
+    const secondPlace = sortedPlayers[1];
+    if (secondPlace) {
+      const lead = winner.score - secondPlace.score;
+      heroLeadTextEl.textContent = `${lead} chip lead`;
+      heroGapTextEl.textContent = `Ahead of ${secondPlace.name}`;
+      overlayWinnerCopyEl.textContent = `${winner.name} finished on top with ${winner.score} chips, beating ${secondPlace.name} by ${lead}.`;
+    } else {
+      heroLeadTextEl.textContent = 'Only player on the board';
+      heroGapTextEl.textContent = 'Automatic winner';
+      overlayWinnerCopyEl.textContent = `${winner.name} owns the whole table tonight.`;
     }
 
-    function saveScores() {
-      localStorage.setItem(storageKey, JSON.stringify(players));
+    overlayWinnerNameEl.textContent = winner.name;
+    overlayWinnerScoreEl.textContent = `${winner.score} chips`;
+
+    function initials(name) {
+      return name
+        .split(' ')
+        .map(part => part[0])
+        .join('')
+        .slice(0, 2)
+        .toUpperCase();
     }
 
-    function changeScore(name, amount) {
-      const player = players.find(p => p.name === name);
-      if (!player) return;
-      player.score += amount;
-      saveScores();
-      render();
+    function ordinal(index) {
+      return ['1st', '2nd', '3rd'][index] || `${index + 1}th`;
     }
 
-    function render() {
-      const sorted = [...players].sort((a, b) => b.score - a.score);
-      const board = document.getElementById('board');
-      board.innerHTML = '';
+    function buildMeta(index, player) {
+      if (index === 0) return 'Winner';
+      const gap = winner.score - player.score;
+      return `${gap} behind`;
+    }
 
-      document.getElementById('leaderName').textContent = sorted[0].name;
-      document.getElementById('leaderScore').textContent = sorted[0].score;
+    scoreGrid.innerHTML = sortedPlayers.map((player, index) => `
+      <article class="row ${index === 0 ? 'winner' : ''}">
+        <div class="place">#${index + 1}</div>
 
-      sorted.forEach((player, index) => {
-        const row = document.createElement('article');
-        row.className = 'player';
-        row.innerHTML = `
-          <div class="rank">#${index + 1}</div>
-          <div class="name">${player.name}</div>
-          <div class="controls">
-            <button class="score-btn minus" aria-label="Subtract one point from ${player.name}">−</button>
-            <div class="score">${player.score}</div>
-            <button class="score-btn plus" aria-label="Add one point to ${player.name}">+</button>
+        <div class="player">
+          <div class="name-line">
+            <div class="avatar">${initials(player.name)}</div>
+            <div>
+              <p class="name">${player.name}</p>
+              <div class="status">${ordinal(index)} place • ${index === 0 ? 'top stack' : 'chasing the lead'}</div>
+            </div>
           </div>
-        `;
+        </div>
 
-        row.querySelector('.minus').addEventListener('click', () => changeScore(player.name, -1));
-        row.querySelector('.plus').addEventListener('click', () => changeScore(player.name, 1));
-        board.appendChild(row);
-      });
+        <div class="score-box">
+          <p class="score-number">${player.score}</p>
+          <div class="score-label">Chip Count</div>
+        </div>
+
+        <div class="meta-box">
+          <div class="meta-main">${buildMeta(index, player)}</div>
+          <div class="meta-label">Position Status</div>
+        </div>
+      </article>
+    `).join('');
+
+    function openWinnerMode() {
+      winnerMode.classList.add('active');
+      winnerMode.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
     }
 
-    document.getElementById('saveBtn').addEventListener('click', () => {
-      saveScores();
-      const button = document.getElementById('saveBtn');
-      const oldText = button.textContent;
-      button.textContent = 'Saved ✓';
-      setTimeout(() => button.textContent = oldText, 900);
-    });
+    function closeWinnerOverlay() {
+      winnerMode.classList.remove('active');
+      winnerMode.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
 
-    document.getElementById('resetBtn').addEventListener('click', () => {
-      if (!confirm('Reset all scores back to Justin 280, Jasmine 208, Dylan 187, and James 125?')) return;
-      players = originalPlayers.map(player => ({ ...player }));
-      saveScores();
-      render();
+    winnerToggle.addEventListener('click', openWinnerMode);
+    closeWinnerMode.addEventListener('click', closeWinnerOverlay);
+    winnerMode.addEventListener('click', (event) => {
+      if (event.target === winnerMode) closeWinnerOverlay();
     });
-
-    render();
+    window.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') closeWinnerOverlay();
+    });
   </script>
 </body>
 </html>
